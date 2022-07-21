@@ -1,0 +1,17 @@
+[package]
+name = "tcpforward"
+version = "0.1.3"
+authors = ["yuchunzhou <chunzhou.yu@qq.com>"]
+edition = "2018"
+keywords = ["network", "tcp", "cli"]
+categories = ["network-programming", "command-line-utilities"]
+license = "GPL-3.0"
+repository = "https://github.com/yuchunzhou/tcpforward"
+homepage = "https://github.com/yuchunzhou/tcpforward"
+description = "A simple tcp forwarding tool"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "1.5.0", features = ["full"] }
+structopt = "0.3.21"
