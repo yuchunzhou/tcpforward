@@ -18,27 +18,21 @@ async fn process_conn(local: TcpStream, remote: TcpStream) {
 
     let mut tasks_map: HashMap<TaskType, JoinHandle<_>> = HashMap::new();
 
-    let write_task = tokio::spawn(async move {
-        copy(&mut local_reader, &mut remote_writer).await
-    });
+    let write_task = tokio::spawn(async move { copy(&mut local_reader, &mut remote_writer).await });
     tasks_map.insert(TaskType::WriteTask, write_task);
 
-    let read_task = tokio::spawn(async move {
-        copy(&mut remote_reader, &mut local_writer).await
-    });
+    let read_task = tokio::spawn(async move { copy(&mut remote_reader, &mut local_writer).await });
     tasks_map.insert(TaskType::ReadTask, read_task);
 
     for (task_type, task) in tasks_map.iter_mut() {
         let result = task.await.unwrap();
         match result {
-            Ok(n) => {
-                match task_type {
-                    TaskType::WriteTask => println!("write {:?} bytes to remote!", n),
-                    TaskType::ReadTask => println!("read {:?} bytes from remote!", n),
-                }
-            }
+            Ok(n) => match task_type {
+                TaskType::WriteTask => println!("send {:?} bytes to remote!", n),
+                TaskType::ReadTask => println!("receive {:?} bytes from remote!", n),
+            },
             Err(e) => {
-                println!("something went error: {:?}", e.to_string());
+                println!("something goes wrong: {:?}", e.to_string());
                 match task_type {
                     TaskType::WriteTask => tasks_map.get(&TaskType::ReadTask).unwrap().abort(),
                     TaskType::ReadTask => tasks_map.get(&TaskType::WriteTask).unwrap().abort(),
@@ -75,17 +69,19 @@ async fn main() -> io::Result<()> {
     let options: Options = Options::from_args();
     println!("service is starting ...");
 
-    let listener = TcpListener::bind(
-        format!("{}:{}", options.local_ip, options.local_port)
-    ).await?;
+    let listener =
+        TcpListener::bind(format!("{}:{}", options.local_ip, options.local_port)).await?;
 
     loop {
         let (local, peer_addr) = listener.accept().await?;
         println!("a new connection {:?} is coming!", peer_addr);
 
-        let remote = match TcpStream::connect(
-            format!("{}:{}", options.remote_ip, options.remote_port)
-        ).await {
+        let remote = match TcpStream::connect(format!(
+            "{}:{}",
+            options.remote_ip, options.remote_port
+        ))
+        .await
+        {
             Ok(s) => s,
             Err(e) => {
                 println!("connect to remote error: {:?}", e.to_string());
