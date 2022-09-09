@@ -3,7 +3,7 @@ A tcp forwarding tool
 [![crates.io](https://img.shields.io/crates/v/tcpforward?style=flat-square&logo=rust)](https://crates.io/crates/tcpforward)
 [![license](https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square)](https://raw.githubusercontent.com/yuchunzhou/tcpforward/main/LICENSE)
 
-### How to use
+### How to use it
 ```shell
 $ tcpforward -h
 tcpforward 0.1.1
